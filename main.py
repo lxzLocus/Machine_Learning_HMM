@@ -1,16 +1,26 @@
 import numpy as np
+import yfinance as yf
 
-# サンプルデータの生成（実際の株価データを使用する場合はここにデータを読み込む）
-np.random.seed(42)
-observations = np.random.choice([0, 1], size=(100,))
+# 期間を指定
+start = '2024-01-01'
+end = '2024-05-30'
+
+# 株価データを指定期間で取得
+financeData = yf.download('NVDA', start, end)
+
+# 終値を格納
+observations = financeData['Close'].values
+
+# 観測値を離散化（例として3つのビンに分類）
+bins = np.linspace(np.min(observations), np.max(observations), num=4)
+discrete_observations = np.digitize(observations, bins) - 1
 
 # HMMのパラメータの定義
 states = [0, 1]
 start_prob = np.array([0.6, 0.4])
-trans_prob = np.array([[0.7, 0.3],
-                       [0.4, 0.6]])
-emission_prob = np.array([[0.5, 0.5],
-                          [0.1, 0.9]])
+trans_prob = np.array([[0.7, 0.3], [0.4, 0.6]])
+emission_prob = np.array([[0.5, 0.5, 0.0, 0.0],  # 状態0からの観測確率
+                          [0.1, 0.1, 0.4, 0.4]]) # 状態1からの観測確率
 
 # 前向きアルゴリズムの実装
 def forward(observations, states, start_prob, trans_prob, emission_prob):
@@ -23,5 +33,5 @@ def forward(observations, states, start_prob, trans_prob, emission_prob):
     
     return alpha
 
-alpha = forward(observations, states, start_prob, trans_prob, emission_prob)
+alpha = forward(discrete_observations, states, start_prob, trans_prob, emission_prob)
 print("Alpha:\n", alpha)
