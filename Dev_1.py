@@ -8,10 +8,6 @@ end = '2024-05-30'
 # 株価データを指定期間で取得
 financeData = yf.download('NVDA', start, end)
 
-# データの確認
-if financeData.empty:
-    raise ValueError("指定した期間にデータが存在しません。")
-
 # 終値を格納
 observations = financeData['Close'].values
 
