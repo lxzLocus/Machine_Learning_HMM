@@ -12,10 +12,6 @@ financeData = yf.download('NVDA', start, end)
 # 終値を格納
 observations = financeData['Close'].values
 
-# データの確認
-if observations.size == 0:
-    raise ValueError("観測データが空です。")
-
 # 観測値を離散化（例として3つのビンに分類）
 bins = np.linspace(np.min(observations), np.max(observations), num=4)
 discrete_observations = np.digitize(observations, bins) - 1
